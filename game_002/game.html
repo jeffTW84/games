@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>友善學習體驗的肌肉選擇遊戲</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+        #game-container {
+            width: 100%;
+            max-width: 600px;
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        #action-display {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        #muscles-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .muscle-item {
+            background-color: #e0e0e0;
+            border: none;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .muscle-item:hover {
+            background-color: #d0d0d0;
+        }
+        .muscle-item.selected {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .muscle-item.incorrect {
+            background-color: #ff6b6b;
+            color: white;
+        }
+        #score, #progress {
+            font-size: 18px;
+            margin: 10px 0;
+        }
+        #start-btn {
+            font-size: 18px;
+            padding: 10px 20px;
+            margin: 20px 0;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        #feedback {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>友善學習體驗的肌肉選擇遊戲</h1>
+    <div id="score">得分: 0</div>
+    <div id="progress">進度: 0 / 13</div>
+    <div id="game-container">
+        <div id="action-display"></div>
+        <div id="muscles-container"></div>
+    </div>
+    <button id="start-btn">開始遊戲</button>
+    <div id="feedback"></div>
+
+    <script>
+        const muscleActionPairs = [
+            { muscles: ["臀大肌", "腿後肌"], action: "髖關節伸直", explanation: "這些肌肉協同工作，使髖關節向後伸展，對於走路、跑步和跳躍等動作至關重要。" },
+            { muscles: ["股直肌", "髂肌", "腰大肌"], action: "髖關節屈曲", explanation: "這組肌肉負責將大腿抬高，對於上樓梯、騎自行車等動作非常重要。" },
+            { muscles: ["頭長肌", "頸長肌", "胸鎖乳突肌"], action: "頸部屈曲", explanation: "這些肌肉使頭部向前傾斜，如點頭動作。" },
+            { muscles: ["頭夾肌", "頸夾肌"], action: "頸部側向屈曲", explanation: "負責使頭部向肩膀傾斜的動作。" },
+            { muscles: ["胸大肌", "前鋸肌"], action: "肩部前突", explanation: "這些肌肉使肩膀向前移動，如推動物體的動作。" },
+            { muscles: ["腹外斜肌", "腹內斜肌"], action: "脊椎側向屈曲", explanation: "使軀幹向側面彎曲，如側彎動作。" },
+            { muscles: ["內收長肌", "內收短肌", "內收大肌"], action: "下肢內收", explanation: "這組肌肉將腿向身體中線移動，如併攏雙腿的動作。" },
+            { muscles: ["三角肌中束", "棘上肌", "斜方肌"], action: "肩部外展", explanation: "負責將手臂從身體側面舉起的動作。" },
+            { muscles: ["頸半棘肌"], action: "頸部旋轉", explanation: "使頭部和頸部旋轉，如左右轉頭的動作。" },
+            { muscles: ["臀中肌", "闊筋膜張肌"], action: "髖關節外展", explanation: "將腿向身體外側移動，如側抬腿的動作。" },
+            { muscles: ["三角肌後束", "小圓肌", "大圓肌", "闊背肌"], action: "肩膀伸直", explanation: "這組肌肉將手臂向後拉，如划船動作。" },
+            { muscles: ["三角肌前束", "喙肱肌", "胸大肌"], action: "肩膀屈曲", explanation: "負責將手臂向前舉起，如前舉手臂的動作。" },
+            { muscles: ["斜方肌", "菱形肌", "闊背肌"], action: "肩胛骨後縮", explanation: "這些肌肉使肩胛骨向脊柱靠近，如挺胸的動作。" }
+        ];
+
+        let score = 0;
+        let currentPairIndex = 0;
+        let currentPair;
+        let selectedMuscles = [];
+
+        const actionDisplay = document.getElementById("action-display");
+        const musclesContainer = document.getElementById("muscles-container");
+        const scoreDisplay = document.getElementById("score");
+        const progressDisplay = document.getElementById("progress");
+        const startBtn = document.getElementById("start-btn");
+        const feedback = document.getElementById("feedback");
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function startGame() {
+            score = 0;
+            currentPairIndex = 0;
+            shuffleArray(muscleActionPairs);
+            displayNextPair();
+            startBtn.style.display = 'none';
+        }
+
+        function displayNextPair() {
+            if (currentPairIndex >= muscleActionPairs.length) {
+                endGame();
+                return;
+            }
+
+            currentPair = muscleActionPairs[currentPairIndex];
+            actionDisplay.textContent = currentPair.action;
+            selectedMuscles = [];
+            displayMuscleOptions();
+            updateProgress();
+            feedback.textContent = "選擇與此動作相關的所有肌肉。";
+        }
+
+        function displayMuscleOptions() {
+            musclesContainer.innerHTML = '';
+            let allMuscles = [...currentPair.muscles];
+            
+            // Add some distractor muscles
+            const allMusclesSet = new Set(muscleActionPairs.flatMap(pair => pair.muscles));
+            const distractors = [...allMusclesSet].filter(muscle => !currentPair.muscles.includes(muscle));
+            shuffleArray(distractors);
+            allMuscles = allMuscles.concat(distractors.slice(0, 8 - allMuscles.length));
+            shuffleArray(allMuscles);
+
+            allMuscles.forEach(muscle => {
+                const button = document.createElement('button');
+                button.className = 'muscle-item';
+                button.textContent = muscle;
+                button.addEventListener('click', () => selectMuscle(muscle, button));
+                musclesContainer.appendChild(button);
+            });
+        }
+
+        function selectMuscle(muscle, button) {
+            if (selectedMuscles.includes(muscle)) {
+                selectedMuscles = selectedMuscles.filter(m => m !== muscle);
+                button.classList.remove('selected');
+                button.classList.remove('incorrect');
+            } else {
+                selectedMuscles.push(muscle);
+                button.classList.add('selected');
+                if (!currentPair.muscles.includes(muscle)) {
+                    button.classList.add('incorrect');
+                    feedback.textContent = "這個不太對，再想想看！";
+                    setTimeout(() => {
+                        button.classList.remove('selected');
+                        button.classList.remove('incorrect');
+                        selectedMuscles = selectedMuscles.filter(m => m !== muscle);
+                    }, 1000);
+                }
+            }
+
+            checkAnswer();
+        }
+
+        function checkAnswer() {
+            const correctMuscles = currentPair.muscles;
+            if (selectedMuscles.length === correctMuscles.length &&
+                selectedMuscles.every(muscle => correctMuscles.includes(muscle))) {
+                score++;
+                feedback.textContent = "太棒了！ " + currentPair.explanation;
+                setTimeout(() => {
+                    currentPairIndex++;
+                    displayNextPair();
+                }, 3000);
+            }
+            updateScore();
+        }
+
+        function updateScore() {
+            scoreDisplay.textContent = `得分: ${score}`;
+        }
+
+        function updateProgress() {
+            progressDisplay.textContent = `進度: ${currentPairIndex + 1} / ${muscleActionPairs.length}`;
+        }
+
+        function endGame() {
+            actionDisplay.textContent = "遊戲結束！";
+            musclesContainer.innerHTML = '';
+            feedback.textContent = `恭喜你完成所有題目！你的最終得分是 ${score} / ${muscleActionPairs.length}。繼續保持學習的熱情！`;
+            startBtn.style.display = 'block';
+            startBtn.textContent = '再玩一次';
+        }
+
+        startBtn.addEventListener("click", startGame);
+    </script>
+</body>
+</html>

@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>迷你游戏集合</title>
+    <title>运动训练小游戏集合</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
             line-height: 1.6;
             color: #333;
             max-width: 800px;
@@ -17,6 +17,7 @@
         h1 {
             color: #2c3e50;
             text-align: center;
+            margin-bottom: 30px;
         }
         .game-list {
             list-style-type: none;
@@ -24,38 +25,60 @@
         }
         .game-item {
             background-color: #fff;
-            margin-bottom: 20px;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        .game-item:hover {
+            transform: translateY(-5px);
         }
         .game-item h2 {
             margin-top: 0;
             color: #3498db;
+            font-size: 24px;
+        }
+        .game-item p {
+            font-size: 16px;
+            margin-bottom: 20px;
         }
         .game-item a {
             display: inline-block;
             background-color: #3498db;
             color: #fff;
-            padding: 10px 15px;
+            padding: 12px 20px;
             text-decoration: none;
-            border-radius: 3px;
+            border-radius: 5px;
             transition: background-color 0.3s;
+            font-weight: bold;
         }
         .game-item a:hover {
             background-color: #2980b9;
         }
+        .featured {
+            border: 2px solid #f39c12;
+        }
+        .featured h2::after {
+            content: " ★";
+            color: #f39c12;
+        }
     </style>
 </head>
 <body>
-    <h1>迷你游戏集合</h1>
+    <h1>运动训练小游戏集合</h1>
     <ul class="game-list">
-        <li class="game-item">
-            <h2>Emoji 配对游戏</h2>
-            <p>一个适合 2-3 岁幼儿的简单 Emoji 配对游戏。通过匹配相同的表情符号来训练记忆力和认知能力。</p>
-            <a href="http://game1.yourdomain.com">开始游戏</a>
+        <li class="game-item featured">
+            <h2>爆发力反应时间训练</h2>
+            <p>提升您的反应速度和爆发力！这个游戏专为运动员设计,通过快速点击目标来训练您的反应时间。适合各类需要快速反应的运动项目,如短跑、拳击、网球等。</p>
+            <p><strong>主要益处:</strong> 提高神经肌肉反应速度,缩短反应时间,增强决策速度,提升整体运动表现。</p>
+            <a href="/game_001/">开始训练</a>
         </li>
-        <!-- 可以在这里添加更多游戏 -->
+        <!-- 未来可以在这里添加更多游戏 -->
+        <li class="game-item">
+            <h2>即将推出更多游戏</h2>
+            <p>我们正在开发更多有趣且有益的训练游戏。敬请期待！</p>
+        </li>
     </ul>
 </body>
 </html>

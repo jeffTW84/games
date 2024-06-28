@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>友善學習體驗的肌肉選擇遊戲</title>
+    <title>肌肉-解剖動作記憶遊戲</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -77,7 +77,7 @@
     </style>
 </head>
 <body>
-    <h1>友善學習體驗的肌肉選擇遊戲</h1>
+    <h1>肌肉-解剖動作記憶遊戲</h1>
     <div id="score">得分: 0</div>
     <div id="progress">進度: 0 / 13</div>
     <div id="game-container">
@@ -176,6 +176,7 @@
                 if (!currentPair.muscles.includes(muscle)) {
                     button.classList.add('incorrect');
                     feedback.textContent = "這個不太對，再想想看！";
+					score--;
                     setTimeout(() => {
                         button.classList.remove('selected');
                         button.classList.remove('incorrect');

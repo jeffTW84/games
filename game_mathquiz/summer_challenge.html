@@ -343,7 +343,7 @@
                 `Accuracy rate: ${accuracy.toFixed(2)}%<br>` +
                 `Total time: ${totalTime.toFixed(1)} seconds<br>` +
                 `<h2>Final score: ${finalScore.toFixed(2)}</h2>`;
-			if (difficulty === 'hard') {
+			if (difficulty === 'hard' && finalScore.toFixed(2) === '100.00') {
 				// Display formatted startTime in the result div
 				const startDate = new Date(startTime).toLocaleString();
 				document.getElementById('result').innerHTML += `<br>Quiz Start Time: ${startDate}`;

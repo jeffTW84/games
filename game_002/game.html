@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,68 +15,84 @@
             margin: 0;
             padding: 20px;
         }
+
         #game-container {
             width: 100%;
             max-width: 600px;
             background-color: #fff;
             border-radius: 10px;
             padding: 20px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
+
         #action-display {
             font-size: 24px;
             font-weight: bold;
             margin-bottom: 20px;
             text-align: center;
         }
+
         #muscles-container {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
         }
-		.muscle-item {
-			background-color: #e0e0e0;
-			border: none;
-			border-radius: 5px;
-			padding: 12px 15px;  /* 增加內邊距 */
-			margin: 6px;         /* 稍微增加外邊距 */
-			cursor: pointer;
-			transition: background-color 0.3s, transform 0.2s;
-			font-size: 1.2rem;   /* 增加字體大小 */
-			font-weight: 500;    /* 稍微加粗字體 */
-			min-width: 120px;    /* 設置最小寬度 */
-			text-align: center;  /* 確保文字居中 */
-		}
 
-		/* 添加懸停效果 */
-		.muscle-item:hover {
-			background-color: #d0d0d0;
-			transform: scale(1.05);
-		}
+        .muscle-item {
+            background-color: #e0e0e0;
+            border: none;
+            border-radius: 5px;
+            padding: 12px 15px;
+            /* 增加內邊距 */
+            margin: 6px;
+            /* 稍微增加外邊距 */
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            font-size: 1.2rem;
+            /* 增加字體大小 */
+            font-weight: 500;
+            /* 稍微加粗字體 */
+            min-width: 120px;
+            /* 設置最小寬度 */
+            text-align: center;
+            /* 確保文字居中 */
+        }
 
-		/* 確保在小屏幕上也能正常顯示 */
-		@media (max-width: 600px) {
-			.muscle-item {
-				font-size: 1.2rem;
-				padding: 10px 12px;
-				min-width: 100px;
-			}
-		}
+        /* 添加懸停效果 */
+        .muscle-item:hover {
+            background-color: #d0d0d0;
+            transform: scale(1.05);
+        }
+
+        /* 確保在小屏幕上也能正常顯示 */
+        @media (max-width: 600px) {
+            .muscle-item {
+                font-size: 1.2rem;
+                padding: 10px 12px;
+                min-width: 100px;
+            }
+        }
+
         .muscle-item:hover {
             background-color: #d0d0d0;
         }
+
         .muscle-item.selected {
             background-color: #4CAF50;
             color: white;
         }
+
         .muscle-item.incorrect {
             background-color: #ff6b6b;
             color: white;
         }
-        #score, #progress {
+
+        #score,
+        #progress {
             font-size: 18px;
             margin: 10px 0;
         }
+
         #start-btn {
             font-size: 18px;
             padding: 10px 20px;
@@ -86,6 +103,7 @@
             border: none;
             border-radius: 5px;
         }
+
         #feedback {
             margin-top: 20px;
             padding: 10px;
@@ -95,6 +113,7 @@
         }
     </style>
 </head>
+
 <body>
     <h1>肌肉-解剖動作記憶遊戲</h1>
     <div id="score">得分: 0</div>
@@ -167,7 +186,7 @@
         function displayMuscleOptions() {
             musclesContainer.innerHTML = '';
             let allMuscles = [...currentPair.muscles];
-            
+
             // Add some distractor muscles
             const allMusclesSet = new Set(muscleActionPairs.flatMap(pair => pair.muscles));
             const distractors = [...allMusclesSet].filter(muscle => !currentPair.muscles.includes(muscle));
@@ -195,7 +214,7 @@
                 if (!currentPair.muscles.includes(muscle)) {
                     button.classList.add('incorrect');
                     feedback.textContent = "這個不太對，再想想看！";
-					score--;
+                    score--;
                     setTimeout(() => {
                         button.classList.remove('selected');
                         button.classList.remove('incorrect');
@@ -240,4 +259,5 @@
         startBtn.addEventListener("click", startGame);
     </script>
 </body>
+
 </html>

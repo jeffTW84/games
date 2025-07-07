@@ -1,0 +1,291 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Quiz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 20px auto;
+            text-align: center;
+            background-color: #f0f0f0;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        #start-page, #quiz-container {
+            display: none;
+        }
+        #start-page.active, #quiz-container.active {
+            display: block;
+        }
+        #question {
+            font-size: 24px;
+            margin-bottom: 20px;
+            min-height: 30px; /* Prevent layout shift */
+        }
+        #answer {
+            padding: 10px;
+            font-size: 16px;
+            width: 100px;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 5px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+        .wrong {
+            color: red;
+        }
+        #restart-btn, #back-btn {
+            display: none;
+            background-color: #008CBA;
+        }
+        #restart-btn:hover, #back-btn:hover {
+            background-color: #007399;
+        }
+        h2 {
+            color: black;
+            margin-top: 20px;
+        }
+        .difficulty-btn {
+            background-color: #0288d1;
+        }
+        .difficulty-btn:hover {
+            background-color: #0277bd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="start-page" class="active">
+        <h1>Math Quiz</h1>
+        <p>Select a difficulty level:</p>
+        <button class="difficulty-btn" onclick="startQuiz('easy')">Easy</button>
+        <button class="difficulty-btn" onclick="startQuiz('medium')">Medium</button>
+        <button class="difficulty-btn" onclick="startQuiz('hard')">Hard</button>
+    </div>
+    <div class="container" id="quiz-container">
+        <h1>Math Quiz - <span id="difficulty-display"></span></h1>
+        <div id="question"></div>
+        <input type="number" id="answer" placeholder="Your answer">
+        <button id="submit-btn">Submit</button>
+        <div id="result"></div>
+        <button id="restart-btn">Restart Quiz</button>
+        <button id="back-btn">Back to Start</button>
+    </div>
+
+    <script>
+        let currentQuestion = 0;
+        let correctCount = 0;
+        const totalQuestions = 10;
+        let correctAnswer;
+        let startTime;
+        let totalTime;
+        let questionTimeout;
+        let difficulty = null;
+
+        const difficultySettings = {
+            easy: {
+                questionDisplayTime: Infinity, // Permanent display
+                num1Range: [10, 50],
+                num2Range: [1, 10],
+                timeWeightThresholds: { min: 0, max: 0, weight: 1 } // Always 1
+            },
+            medium: {
+                questionDisplayTime: 5000, // 5 seconds
+                num1Range: [10, 50],
+                num2Range: [50, 99],
+                timeWeightThresholds: { min: 60, max: 180 }
+            },
+            hard: {
+                questionDisplayTime: 1500, // 1.5 seconds
+                num1Range: [10, 99],
+                num2Range: [10, 99],
+                timeWeightThresholds: { min: 45, max: 180 }
+            }
+        };
+
+        function startQuiz(selectedDifficulty) {
+            difficulty = selectedDifficulty;
+            document.getElementById('start-page').classList.remove('active');
+            document.getElementById('quiz-container').classList.add('active');
+            document.getElementById('difficulty-display').textContent = difficulty.charAt(0).toUpperCase() + difficulty.slice(1);
+            currentQuestion = 0;
+            correctCount = 0;
+            startTime = Date.now();
+            showQuestion();
+        }
+
+        function generateQuestion() {
+            const settings = difficultySettings[difficulty];
+            const num1 = Math.floor(Math.random() * (settings.num1Range[1] - settings.num1Range[0] + 1)) + settings.num1Range[0];
+            const num2 = Math.floor(Math.random() * (settings.num2Range[1] - settings.num2Range[0] + 1)) + settings.num2Range[0];
+            const operator = Math.random() < 0.5 ? '+' : '-';
+            const question = `${num1} ${operator} ${num2} = `;
+            correctAnswer = operator === '+' ? num1 + num2 : num1 - num2;
+            return question;
+        }
+
+        function showQuestion() {
+            if (currentQuestion < totalQuestions) {
+                const questionText = generateQuestion();
+                const questionElement = document.getElementById('question');
+                questionElement.textContent = `Question ${currentQuestion + 1}: ${questionText}`;
+                document.getElementById('answer').value = '';
+                document.getElementById('answer').focus();
+                document.getElementById('result').textContent = '';
+
+                // Hide question after display time (if not permanent)
+                clearTimeout(questionTimeout);
+                if (difficultySettings[difficulty].questionDisplayTime !== Infinity) {
+                    questionTimeout = setTimeout(() => {
+                        questionElement.textContent = ' ';
+                    }, difficultySettings[difficulty].questionDisplayTime);
+                }
+            } else {
+                showFinalResult();
+            }
+        }
+
+        function calculateTimeWeight(totalTime) {
+            const settings = difficultySettings[difficulty].timeWeightThresholds;
+            if (settings.weight !== undefined) {
+                return settings.weight; // Easy mode: always 1
+            }
+            if (totalTime < settings.min) {
+                return 1;
+            } else if (totalTime > settings.max) {
+                return 0;
+            } else {
+                return (settings.max - totalTime) / (settings.max - settings.min);
+            }
+        }
+
+        function showFinalResult() {
+            clearTimeout(questionTimeout);
+            totalTime = (Date.now() - startTime) / 1000; // Total time in seconds
+            const accuracy = (correctCount / totalQuestions) * 100;
+            const timeWeight = calculateTimeWeight(totalTime);
+            const finalScore = accuracy * timeWeight;
+            document.getElementById('question').textContent = 'Quiz completed!';
+            document.getElementById('result').innerHTML = 
+                `You got ${correctCount} out of ${totalQuestions} correct<br>` +
+                `Accuracy rate: ${accuracy.toFixed(2)}%<br>` +
+                `Total time: ${totalTime.toFixed(1)} seconds<br>` +
+                `<h2>Final score: ${finalScore.toFixed(2)}</h2>`;
+            document.getElementById('answer').style.display = 'none';
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('restart-btn').style.display = 'inline-block';
+            document.getElementById('back-btn').style.display = 'inline-block';
+        }
+
+        document.getElementById('submit-btn').addEventListener('click', () => {
+            clearTimeout(questionTimeout);
+            const userAnswer = parseInt(document.getElementById('answer').value);
+            if (isNaN(userAnswer)) {
+                document.getElementById('result').innerHTML = '<span class="wrong">Please enter a valid number!</span>';
+                return;
+            }
+
+            if (userAnswer === correctAnswer) {
+                correctCount++;
+                currentQuestion++;
+                showQuestion(); // Immediately show next question
+            } else {
+                document.getElementById('result').innerHTML = `<span class="wrong">Wrong! The correct answer is ${correctAnswer}</span>`;
+                currentQuestion++;
+                setTimeout(showQuestion, 2000); // 2-second delay for wrong answer
+            }
+        });
+
+        document.getElementById('answer').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('submit-btn').click();
+            }
+        });
+
+        document.getElementById('restart-btn').addEventListener('click', () => {
+            clearTimeout(questionTimeout);
+            currentQuestion = 0;
+            correctCount = 0;
+            document.getElementById('answer').style.display = 'inline-block';
+            document.getElementById('submit-btn').style.display = 'inline-block';
+            document.getElementById('restart-btn').style.display = 'none';
+            document.getElementById('back-btn').style.display = 'none';
+            startTime = Date.now(); // Reset timer
+            showQuestion();
+        });
+
+        document.getElementById('back-btn').addEventListener('click', () => {
+            clearTimeout(questionTimeout);
+            document.getElementById('quiz-container').classList.remove('active');
+            document.getElementById('start-page').classList.add('active');
+            document.getElementById('answer').style.display = 'inline-block';
+            document.getElementById('submit-btn').style.display = 'inline-block';
+            document.getElementById('restart-btn').style.display = 'none';
+            document.getElementById('back-btn').style.display = 'none';
+            difficulty = null;
+        });
+
+        // Show start page initially
+        document.getElementById('start-page').classList.add('active');
+    </script>
+</body>
+</html>

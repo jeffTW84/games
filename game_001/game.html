@@ -1,17 +1,20 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>反應時間訓練</title>
     <style>
-        body, html {
+        body,
+        html {
             margin: 0;
             padding: 0;
             height: 100%;
             font-family: Arial, sans-serif;
             background-color: #f0f0f0;
         }
+
         #game-area {
             display: flex;
             flex-direction: column;
@@ -20,6 +23,7 @@
             height: 100%;
             text-align: center;
         }
+
         #game-container {
             width: 100%;
             height: 100%;
@@ -28,6 +32,7 @@
             overflow: hidden;
             display: none;
         }
+
         .target {
             width: 40px;
             height: 40px;
@@ -36,11 +41,14 @@
             cursor: pointer;
             transition: transform 0.1s;
         }
+
         .target.hit {
             transform: scale(1.2);
             opacity: 0.7;
         }
-        #start-btn, #replay-btn {
+
+        #start-btn,
+        #replay-btn {
             font-size: 18px;
             padding: 10px 20px;
             margin-top: 20px;
@@ -51,6 +59,7 @@
             border-radius: 5px;
             touch-action: manipulation;
         }
+
         .feedback {
             position: absolute;
             font-size: 20px;
@@ -59,12 +68,14 @@
             pointer-events: none;
             animation: fadeOut 0.5s forwards;
         }
+
         @keyframes fadeOut {
             to {
                 opacity: 0;
                 transform: translateY(-20px);
             }
         }
+
         #results {
             display: none;
             background-color: rgba(255, 255, 255, 0.9);
@@ -74,6 +85,7 @@
         }
     </style>
 </head>
+
 <body>
     <div id="game-area">
         <h1>反應時間訓練</h1>
@@ -142,14 +154,14 @@
             const reactionTime = Date.now() - lastTargetTime;
             reactionTimes.push(reactionTime);
             score++;
-            
+
             target.classList.add('hit');
             setTimeout(() => {
                 if (gameContainer.contains(target)) {
                     gameContainer.removeChild(target);
                 }
             }, 100);
-            
+
             targets = targets.filter(t => t !== target);
             createFeedback(target, reactionTime);
             createTarget();
@@ -199,7 +211,7 @@
             gameContainer.innerHTML = '';
             gameContainer.style.display = 'none';
             results.style.display = 'block';
-            
+
             const avgTime = reactionTimes.reduce((a, b) => a + b, 0) / reactionTimes.length;
             finalScore.textContent = `最終分數：${score}`;
             finalAvgTime.textContent = `平均反應時間：${avgTime.toFixed(2)}毫秒`;
@@ -208,11 +220,12 @@
         startBtn.addEventListener('click', startGame);
         replayBtn.addEventListener('click', startGame);
 
-        gameContainer.addEventListener('touchmove', function(e) {
+        gameContainer.addEventListener('touchmove', function (e) {
             if (e.touches.length > 1) {
                 e.preventDefault();
             }
         }, { passive: false });
     </script>
 </body>
+
 </html>

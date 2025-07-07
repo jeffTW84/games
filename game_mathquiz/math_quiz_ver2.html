@@ -349,7 +349,8 @@
             document.getElementById('back-btn').style.display = 'inline-block';
 			
             // Fireworks for Hard mode perfect score
-            if (difficulty === 'easy' && finalScore.toFixed(2) === '100.00') {
+            // if (difficulty === 'hard' && finalScore.toFixed(2) === '100.00') {
+			if (finalScore.toFixed(2) === '100.00') {
                 showFireworks();
             }
         }

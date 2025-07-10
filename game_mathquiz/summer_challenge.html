@@ -290,7 +290,7 @@
             const settings = difficultySettings[difficulty];
             const num1 = Math.floor(Math.random() * (settings.num1Range[1] - settings.num1Range[0] + 1)) + settings.num1Range[0];
             const num2 = Math.floor(Math.random() * (settings.num2Range[1] - settings.num2Range[0] + 1)) + settings.num2Range[0];
-            const operator = Math.random() < 0.5 ? '+' : '-';
+            const operator = Math.random() < 0.4 ? '+' : '-';
 			const question = `${num1} ${operator} ${num2} =`;
             correctAnswer = operator === '+' ? num1 + num2 : num1 - num2;
             return question;

@@ -175,16 +175,16 @@
                 timeWeightThresholds: { min: 0, max: 0, weight: 1 } // Always 1
             },
             medium: {
-                questionDisplayTime: 5000, // 5 seconds
+                questionDisplayTime: 5000, // 5 seconds display
                 num1Range: [10, 50],
                 num2Range: [50, 99],
-                timeWeightThresholds: { min: 60, max: 180 }
+                timeWeightThresholds: { min: 45, max: 180 }
             },
             hard: {
-                questionDisplayTime: 1500, // 1.5 seconds
+                questionDisplayTime: 1500, // 1.5 seconds display
                 num1Range: [10, 99],
                 num2Range: [10, 99],
-                timeWeightThresholds: { min: 25, max: 120 }
+                timeWeightThresholds: { min: 25, max: 180 }
             }
         };
 
@@ -290,7 +290,7 @@
             const settings = difficultySettings[difficulty];
             const num1 = Math.floor(Math.random() * (settings.num1Range[1] - settings.num1Range[0] + 1)) + settings.num1Range[0];
             const num2 = Math.floor(Math.random() * (settings.num2Range[1] - settings.num2Range[0] + 1)) + settings.num2Range[0];
-            const operator = Math.random() < 0.4 ? '+' : '-';
+            const operator = Math.random() < 0.5 ? '+' : '-';
 			const question = `${num1} ${operator} ${num2} =`;
             correctAnswer = operator === '+' ? num1 + num2 : num1 - num2;
             return question;
